@@ -1,0 +1,11 @@
+<resources>
+    <string name="app_name">SmartAlarm</string>
+    <string name="set">Set</string>
+    <string name="one_time_alarm">One Time Alarm</string>
+    <string name="content_image_icon_one_time_alarm">Image Icon One Time Alarm</string>
+    <string name="set_date">Set Date</string>
+    <string name="set_time">Set Time</string>
+    <string name="note">Note</string>
+    <string name="input_your_note">Input Your Note</string>
+    <string name="content_image_icon_repeating_alarm">Image Icon Repeating Alarm</string>
+</resources>
