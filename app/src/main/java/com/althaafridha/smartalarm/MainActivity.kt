@@ -3,56 +3,74 @@ package com.althaafridha.smartalarm
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.util.Log
+import androidx.recyclerview.widget.LinearLayoutManager
+import com.althaafridha.smartalarm.adapter.AlarmAdapter
+import com.althaafridha.smartalarm.data.Alarm
+import com.althaafridha.smartalarm.data.local.AlarmDB
 import com.althaafridha.smartalarm.databinding.ActivityMainBinding
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import java.text.SimpleDateFormat
 import java.util.*
+import kotlin.collections.ArrayList
 
 class MainActivity : AppCompatActivity() {
 
-    private lateinit var binding: ActivityMainBinding
+    private var _binding: ActivityMainBinding? = null
+    private val binding get() = _binding as ActivityMainBinding
+
+    private var alarmAdapter: AlarmAdapter? = null
+
+    private val db by lazy { AlarmDB(this) }
+
+    override fun onResume() {
+        super.onResume()
+        CoroutineScope(Dispatchers.IO).launch {
+            val alarm = db.alarmDao().getAlarm()
+            alarmAdapter?.setData(alarm)
+            Log.i("GetAlarm", "SetupRecyclerView: with this data $alarm")
+        }
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
 
-        binding = ActivityMainBinding.inflate(layoutInflater)
+        _binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-//        initTimeToday()
-//        initDateToday()
         initView()
+
+        setUpRecyclerView()
+
     }
 
-    private fun initView() {
+    private fun setUpRecyclerView() {
         binding.apply {
-            cvOneTimeAlarm.setOnClickListener{
-                startActivity(Intent(applicationContext, OneTimeAlarmActivity::class.java))
-            }
-            cvRepeatAlarm.setOnClickListener {
-                startActivity(Intent(this@MainActivity, RepeatingAlarmActivity::class.java))
+            rvReminderAlarm.apply {
+                alarmAdapter = AlarmAdapter()
+                layoutManager = LinearLayoutManager(context)
+                adapter = alarmAdapter
             }
         }
     }
 
-    /* TIDAK DIGUNAKAN KARENA MEMAKAI TEXTCLOCK */
-
-//    private fun initDateToday() {
-//        val calendar = Calendar.getInstance()
-//        val dateFormat = SimpleDateFormat("EEEE, dd MMM yyy", Locale.getDefault())
-//        val formatedDate = dateFormat.format(calendar.time)
-//
-//        binding.tvDateToday.text = formatedDate
-//    }
-//
-//    private fun initTimeToday() {
-//        // buat dapetin segala hal yang berhubungan dengan waktu di android
-//        val calendar = Calendar.getInstance()
-//
-//        // menentukan format jam yang akan digunakan, contoh 16.22 atau 04.22 atau 16.22.50
-//        // HH = 24jam
-//        // "hh:mm aa" format am pm
-//        val timeFormat = SimpleDateFormat("HH:mm", Locale.getDefault())
-//        val formatedTime = timeFormat.format(calendar.time)
-//
-//        binding.tvTimeToday.text = formatedTime
-//    }
+    private fun initView() {
+        binding.apply {
+            cvOneTimeAlarm.setOnClickListener {
+                startActivity(Intent(applicationContext, OneTimeAlarmActivity::class.java))
+            }
+            cvRepeatAlarm.setOnClickListener {
+                startActivity(
+                    Intent(
+                        this@MainActivity,
+                        RepeatingAlarmActivity::class.java
+                    )
+                )
+            }
+        }
+    }
 }

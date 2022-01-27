@@ -1,4 +1,4 @@
-package com.althaafridha.smartalarm
+package com.althaafridha.smartalarm.fragment
 
 import android.app.DatePickerDialog
 import android.app.Dialog
