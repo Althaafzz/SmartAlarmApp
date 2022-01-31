@@ -1,6 +1,8 @@
 package com.althaafridha.smartalarm.data.local
 
+import androidx.lifecycle.LiveData
 import androidx.room.Dao
+import androidx.room.Delete
 import androidx.room.Insert
 import androidx.room.Query
 import com.althaafridha.smartalarm.data.Alarm
@@ -11,6 +13,9 @@ interface AlarmDao {
     fun addAlarm(alarm: Alarm)
 
     @Query("SELECT * FROM alarm")
-    fun getAlarm(): List<Alarm>
+    fun getAlarm(): LiveData<List<Alarm>>
+
+    @Delete
+    fun deleteAlarm(alarm: Alarm)
 
 }

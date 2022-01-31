@@ -2,13 +2,14 @@ package com.althaafridha.smartalarm.adapter
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.althaafridha.smartalarm.data.Alarm
 import com.althaafridha.smartalarm.databinding.ItemRowReminderAlarmBinding
 
 class AlarmAdapter: RecyclerView.Adapter<AlarmAdapter.MyViewHolder>() {
 
-    var listAlarm: List<Alarm> = arrayListOf()
+    var listAlarm: ArrayList<Alarm> = arrayListOf()
 
    inner class MyViewHolder(val binding: ItemRowReminderAlarmBinding):
        RecyclerView.ViewHolder(binding.root)
@@ -33,6 +34,11 @@ class AlarmAdapter: RecyclerView.Adapter<AlarmAdapter.MyViewHolder>() {
     override fun getItemCount(): Int = listAlarm.size
 
     fun setData(data: List<Alarm>){
-        this.listAlarm = data
+        val alarmDiffutil = AlarmDiffutil(listAlarm, data)
+        val diffutilResult = DiffUtil.calculateDiff(alarmDiffutil)
+        diffutilResult.dispatchUpdatesTo(this)
+        listAlarm.clear()
+        listAlarm.addAll(data)
+//        notifyDataSetChanged()
     }
 }

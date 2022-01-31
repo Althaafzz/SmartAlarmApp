@@ -68,6 +68,9 @@ class OneTimeAlarmActivity : AppCompatActivity(),
                     }
                 }
             }
+            btnCancel.setOnClickListener{
+                finish()
+            }
         }
     }
 
