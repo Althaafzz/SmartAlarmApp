@@ -26,12 +26,14 @@ class MainActivity : AppCompatActivity() {
     private val binding get() = _binding as ActivityMainBinding
 
     private var alarmAdapter: AlarmAdapter? = null
+    private var alarmService: AlarmReceiver? = null
 
     private val db by lazy { AlarmDB(this) }
 
     override fun onResume() {
         super.onResume()
 
+//         karena udah pake livedata gk perlu lagi di taro di onResume()
         db.alarmDao().getAlarm().observe(this){
             alarmAdapter?.setData(it)
             Log.i("GetAlarm", "SetupRecyclerView: with this data $it")
@@ -55,6 +57,7 @@ class MainActivity : AppCompatActivity() {
         initView()
 
         setUpRecyclerView()
+        alarmService = AlarmReceiver()
 
     }
 
@@ -94,7 +97,7 @@ class MainActivity : AppCompatActivity() {
                 viewHolder: RecyclerView.ViewHolder,
                 target: RecyclerView.ViewHolder
             ): Boolean {
-                return false
+                return true
             }
 
             override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
@@ -104,7 +107,7 @@ class MainActivity : AppCompatActivity() {
                     deletedItem?.let { db.alarmDao().deleteAlarm(it) }
                     Log.i("DeletedAlarm", "onSwipped: Succes deleted alarm with $deletedItem")
                 }
-//                alarmAdapter?.notifyItemRemoved(viewHolder.adapterPosition)
+                deletedItem?.type?.let { alarmService?.cancelAlarm(applicationContext, it) }
             }
 
         }).attachToRecyclerView(recyclerView)

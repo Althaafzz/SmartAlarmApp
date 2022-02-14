@@ -23,6 +23,7 @@ class OneTimeAlarmActivity : AppCompatActivity(),
     private val binding get() = _binding as ActivityOneTimeAlarmBinding
 
     private val db by lazy { AlarmDB(this) }
+    private var alarmService: AlarmReceiver? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -30,8 +31,10 @@ class OneTimeAlarmActivity : AppCompatActivity(),
         _binding = ActivityOneTimeAlarmBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
+        alarmService = AlarmReceiver()
         initView()
     }
+
     private fun initView() {
         binding.apply {
             btnSetDateOneTime.setOnClickListener{
@@ -53,14 +56,15 @@ class OneTimeAlarmActivity : AppCompatActivity(),
                         Toast.LENGTH_SHORT
                     ).show()
                 }else {
+                    alarmService?.setOneTimeAlarm(applicationContext, 0, date, time, message)
                     CoroutineScope(Dispatchers.IO).launch {
                         db.alarmDao().addAlarm(
                             Alarm(
                                 0,
                                 date,
                                 time,
-                                message
-
+                                message,
+                                AlarmReceiver.TYPE_ONE_TIME
                             )
                         )
                         Log.i("AddAlarm", "alarm set on $date $time with message $message")

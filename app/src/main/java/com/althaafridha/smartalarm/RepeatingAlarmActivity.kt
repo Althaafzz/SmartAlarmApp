@@ -4,6 +4,7 @@ import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
 import android.widget.Toast
+import com.althaafridha.smartalarm.AlarmReceiver.Companion.TYPE_REPEATING
 import com.althaafridha.smartalarm.data.Alarm
 import com.althaafridha.smartalarm.data.local.AlarmDB
 import com.althaafridha.smartalarm.databinding.ActivityRepeatingAlarmBinding
@@ -20,12 +21,15 @@ class RepeatingAlarmActivity : AppCompatActivity(), TimeDialogFragment.TimeDialo
 
     private val db by lazy { AlarmDB(this) }
 
+    private var alarmReceiver : AlarmReceiver? = null
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
         _binding = ActivityRepeatingAlarmBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
+        alarmReceiver = AlarmReceiver()
         initView()
     }
 
@@ -40,24 +44,34 @@ class RepeatingAlarmActivity : AppCompatActivity(), TimeDialogFragment.TimeDialo
                 val message = edtNoteRepeat.text.toString()
 
                 if(time == "Time"){
-                    Toast.makeText(applicationContext,
-                        getString(R.string.txt_toast_msg_set_alarm),
+                    Toast.makeText(this@RepeatingAlarmActivity,
+                        "Tentukan waktu alarm",
                         Toast.LENGTH_SHORT
                     ).show()
                 }else {
+                    alarmReceiver?.setRepeatingAlarm(
+                        applicationContext,
+                        TYPE_REPEATING,
+                        time,
+                        message
+                    )
                     CoroutineScope(Dispatchers.IO).launch {
                         db.alarmDao().addAlarm(
                             Alarm(
                                 0,
                                 "Repeating Alarm",
                                 time,
-                                message
+                                message,
+                                TYPE_REPEATING
                             )
                         )
                         Log.i("AddAlarm", "alarm set on $time with message $message")
                         finish()
                     }
                 }
+            }
+            btnCancel.setOnClickListener{
+                finish()
             }
 
         }
